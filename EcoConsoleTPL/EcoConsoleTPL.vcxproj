@@ -115,7 +115,9 @@
   <ItemGroup>
     <ClInclude Include="Command.h" />
     <ClInclude Include="Converter.h" />
+    <ClInclude Include="Invoke.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="Callbacks.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,7 +11,7 @@ public:
 		return m_func;
 	}
 
-	using ArgCount = std::integral_constant<size_t, ARGCOUNT>;
+	static constexpr uint16_t ArgCount = ARGCOUNT;
 	using ArgType1 = ARG1;
 	using ArgType2 = ARG2;
 private:

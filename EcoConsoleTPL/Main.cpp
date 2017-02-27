@@ -1,54 +1,12 @@
 #include <tuple>
 #include "Command.h"
 #include "Utils.h"
-#include "Converter.h"
+#include "Invoke.h"
 #include <iostream>
-
-void void0() {
-	std::cout << "CALLED 'void'\n";
-}
-
-void int1(const int& i) {
-	std::cout << "CALLED 'int1' ARGS: " << i << '\n';
-}
-
-void float2(const float& f1, const float& f2) {
-	std::cout << "CALLED 'float2' ARGS: " << f1 << " " << f2 << '\n';
-}
-
-template<size_t COUNT, typename ARGT1, typename ARGT2>
-struct Invoke {};
-
-template <typename ARGT1, typename ARGT2>
-struct Invoke<0, ARGT1, ARGT2> {
-	template <typename CALLABLE>
-	static void Do(CALLABLE func, const std::vector<std::string>&) {
-		func();
-	}
-};
-
-template <typename ARGT1, typename ARGT2>
-struct Invoke<1, ARGT1, ARGT2> {
-	template <typename CALLABLE>
-	static void Do(CALLABLE func, const std::vector<std::string>& tokens) {
-		const auto& arg1 = Converter<ARGT1>(tokens[1]);
-		func(arg1);
-	}
-};
-
-template <typename ARGT1, typename ARGT2>
-struct Invoke<2, ARGT1, ARGT2> {
-	template <typename CALLABLE>
-	static void Do(CALLABLE func, const std::vector<std::string>& tokens) {
-		const auto& arg1 = Converter<ARGT1>(tokens[1]);
-		const auto& arg2 = Converter<ARGT2>(tokens[2]);
-		func(arg1, arg2);
-	}
-};
+#include "Callbacks.h"
 
 template<size_t C, typename CMD>
 struct HelpHelper {};
-
 
 template <typename CMD> 
 struct HelpHelper<2, CMD> {
@@ -81,8 +39,8 @@ void MagicStartsHere(const std::tuple<ARGS...>& cmds, const std::vector<std::str
 			using T = typename std::remove_const_t<std::remove_reference_t<decltype(command)>>;
 			std::stringstream ss;
 			ss << "Command '" << command.GetName() << "' ARGC: ";
-			ss << T::ArgCount::value;
-			HelpHelper<T::ArgCount::value, T>::Do(ss);
+			ss << T::ArgCount;
+			HelpHelper<T::ArgCount, T>::Do(ss);
 			out.push_back(ss.str());
 		});
 		for (const auto& str : out) {
@@ -96,11 +54,11 @@ void MagicStartsHere(const std::tuple<ARGS...>& cmds, const std::vector<std::str
 		if (command.GetName() == tokens.front()) {
 			found = true;
 			using T = typename std::remove_const_t<std::remove_reference_t<decltype(command)>>;
-			if (tokens.size() != T::ArgCount() + 1) {
-				Throw("Excepted ", T::ArgCount::value, " arguments, got ", tokens.size() - 1);
+			if (tokens.size() != T::ArgCount + 1) {
+				Throw("Excepted ", T::ArgCount, " arguments, got ", tokens.size() - 1);
 			}
 			auto fn = command.GetFunc();
-			Invoke<T::ArgCount::value, T::ArgType1, T::ArgType2>::Do(fn, tokens);
+			Invoke<T::ArgCount, T::ArgType1, T::ArgType2>::Do(fn, tokens);
 		}
 	};
 
