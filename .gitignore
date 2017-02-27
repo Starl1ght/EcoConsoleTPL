@@ -83,3 +83,4 @@ Debug*
 .git*
 *.VC.db
 *.vcxproj.*
+*.opendb

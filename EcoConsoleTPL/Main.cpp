@@ -5,28 +5,6 @@
 #include <iostream>
 #include "Callbacks.h"
 
-template<size_t C, typename CMD>
-struct HelpHelper {};
-
-template <typename CMD> 
-struct HelpHelper<2, CMD> {
-	static void Do(std::stringstream& ss) {
-		ss << " TYPES: " << typeid(CMD::ArgType1).name() << ' ' << typeid(CMD::ArgType2).name();
-	}
-};
-
-template <typename CMD>
-struct HelpHelper<1, CMD> {
-	static void Do(std::stringstream& ss) {
-		ss << " TYPES: " << typeid(CMD::ArgType1).name();
-	}
-};
-
-template <typename CMD>
-struct HelpHelper<0, CMD> {
-	static void Do(std::stringstream& ss) {}
-};
-
 template <typename...ARGS>
 void MagicStartsHere(const std::tuple<ARGS...>& cmds, const std::vector<std::string>& tokens) {
 	if (tokens.empty()) {
@@ -34,18 +12,7 @@ void MagicStartsHere(const std::tuple<ARGS...>& cmds, const std::vector<std::str
 	}
 
 	if (tokens[0] == "help") {
-		std::vector<std::string> out;
-		ForEach(cmds, [&out](const auto& command) {
-			using T = typename std::remove_const_t<std::remove_reference_t<decltype(command)>>;
-			std::stringstream ss;
-			ss << "Command '" << command.GetName() << "' ARGC: ";
-			ss << T::ArgCount;
-			HelpHelper<T::ArgCount, T>::Do(ss);
-			out.push_back(ss.str());
-		});
-		for (const auto& str : out) {
-			std::cout << str << '\n';
-		}
+		ShowHelp(cmds);
 		return;
 	}
 
