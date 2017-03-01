@@ -5,6 +5,29 @@
 #include <iostream>
 #include "Callbacks.h"
 
+template <typename CALLABLE, size_t ARGC, typename T1, typename T2>
+bool IterateTuple(const iter& curr, const iter& last, const Command_t<CALLABLE, ARGC, T1, T2>& command) {
+    if (command.GetName() == *curr) {
+        if (std::distance(curr, last) != ARGC + 1) {
+            Throw("Excepted ", ARGC, " arguments, got ", std::distance(curr, last) - 1);
+        }
+        auto fn = command.GetFunc();
+        Invoke<ARGC, T1, T2>::Do(fn, curr);
+    }
+}
+
+template <typename...ARGS>
+bool IterateTuple(const iter& curr, const iter& last, const Branch_t<ARGS...>& branch) {
+    if (branch.GetName() == *curr) {
+        if (std::distance(curr, last) == 1) {
+            Throw("Excepted command after branch, got none");
+        }
+        ForEach(branch.GetChildren(), [&curr, &last](const auto &elem) {
+            IterateTuple(curr + 1, last, elem);
+        });
+    }
+}
+
 template <typename...ARGS>
 void MagicStartsHere(const std::tuple<ARGS...>& cmds, const std::vector<std::string>& tokens) {
 	if (tokens.empty()) {
@@ -16,27 +39,17 @@ void MagicStartsHere(const std::tuple<ARGS...>& cmds, const std::vector<std::str
 		return;
 	}
 
-	bool found = false;
-	auto fn = [&tokens, &found](const auto& command) {
-		if (command.GetName() == tokens.front()) {
-			found = true;
-			using T = typename std::remove_const_t<std::remove_reference_t<decltype(command)>>;
-			if (tokens.size() != T::ArgCount + 1) {
-				Throw("Excepted ", T::ArgCount, " arguments, got ", tokens.size() - 1);
-			}
-			auto fn = command.GetFunc();
-			Invoke<T::ArgCount, T::ArgType1, T::ArgType2>::Do(fn, tokens);
-		}
-	};
-
-	ForEach(cmds, fn);
-	if (!found) {
-		Throw("Command '", tokens[0], "' is not found");
-	}
+	ForEach(cmds, [&tokens] (const auto& elem) {
+        IterateTuple(tokens.cbegin(), tokens.cend(), elem);
+    });
 }
 
-void main() {
+int main() {
 	const auto commands = std::make_tuple(
+        MakeBranch("branch",
+            MakeCommand("cmd", br_cmd),
+            MakeCommand("cmd2", br_cmd)
+        ),
 		MakeCommand("void", void0),
 		MakeCommand("int1", int1),
 		MakeCommand("float2", float2)

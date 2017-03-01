@@ -3,7 +3,7 @@
 
 template <typename T>
 T Converter(const std::string&) {
-	static_assert(false, "Converter for this type is not specialized");
+	static_assert(std::is_same<T, void>::value, "Converter for this type is not specialized");
 	return T{};
 }
 
@@ -23,4 +23,9 @@ inline float Converter<float>(const std::string& str) {
 	} catch (...) {
 		Throw("Unable to convert '", str, "' to float");
 	}
+}
+
+template<>
+inline std::string Converter<std::string>(const std::string& str) {
+	return str;
 }

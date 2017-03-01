@@ -12,3 +12,7 @@ inline void int1(const int& i) {
 inline void float2(const float& f1, const float& f2) {
 	std::cout << "CALLED 'float2' ARGS: " << f1 << " " << f2 << '\n';
 }
+
+inline void br_cmd(const std::string& str) {
+	std::cout << "CALLED 'br_cmd' ARGS: " << str << '\n';
+}
