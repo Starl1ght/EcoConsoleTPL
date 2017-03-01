@@ -84,3 +84,4 @@ Debug*
 *.VC.db
 *.vcxproj.*
 *.opendb
+enc_temp_folder/*

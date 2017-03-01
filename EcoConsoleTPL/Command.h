@@ -25,8 +25,6 @@ private:
 
 	const std::string m_name;
 	const CALLABLE m_func;
-
-
 };
 
 inline auto MakeCommand(std::string&& name, void(*func)()) {
@@ -63,6 +61,6 @@ private:
 };
 
 template <typename...ARGS>
-inline Branch_t<ARGS...> MakeBranch(std::string&& name, const ARGS&...args) {
+Branch_t<ARGS...> MakeBranch(std::string&& name, const ARGS&...args) {
 	return Branch_t<ARGS...>(name, args...);
 }

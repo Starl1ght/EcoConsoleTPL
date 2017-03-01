@@ -74,38 +74,34 @@ std::string DEMANGLE(const std::string& mangled) {
 }
 #endif
 
-template<size_t C, typename CMD>
-struct HelpHelper {};
-
-template <typename CMD>
-struct HelpHelper<2, CMD> {
-	static void Do(std::stringstream& ss) {
-		const std::string tname1 = DEMANGLE(typeid(typename CMD::ArgType1).name());
-		const std::string tname2 = DEMANGLE(typeid(typename CMD::ArgType2).name());
-		ss << " TYPES: " << tname1 << ' ' << tname2;
-	}
-};
-
-template <typename CMD>
-struct HelpHelper<1, CMD> {
-	static void Do(std::stringstream& ss) {
-		ss << " TYPES: " << DEMANGLE(typeid(typename CMD::ArgType1).name());
-	}
-};
-
-template <typename CMD>
-struct HelpHelper<0, CMD> {
-	static void Do(std::stringstream& ss) {}
-};
-
 // Show Help
+template <typename CALLABLE, size_t ARGC, typename T1, typename T2>
+std::string GenerateHelp(const Command_t<CALLABLE, ARGC, T1, T2>& cmd) {
+	if (ARGC == 0) {
+		return "";
+	}
+	std::string ret{ " TYPES : " };
+	switch (ARGC) {
+	case 1:
+		ret += DEMANGLE(typeid(typename T1).name());
+		break;
+	case 2:
+		ret += DEMANGLE(typeid(typename T1).name());
+		ret += ' ';
+		ret += DEMANGLE(typeid(typename T2).name());
+		break;
+	default:
+		return "Add something new!";
+	}
+	return ret;
+}
 
 template <typename CALLABLE, size_t ARGC, typename T1, typename T2>
 void HelpIterateTuple(std::vector<std::string>& out, std::vector<std::string>& depth, const Command_t<CALLABLE, ARGC, T1, T2>& command) {
-	std::stringstream ss;
-	ss << DepthToString(depth) << "-> " << command.GetName();
-	HelpHelper<ARGC, Command_t<CALLABLE, ARGC, T1, T2>>::Do(ss);
-	out.push_back(ss.str());
+	std::string ret{ DepthToString(depth) };
+	ret += "-> " + command.GetName();
+	ret += GenerateHelp(command);
+	out.push_back(move(ret));
 };
 
 template <typename...ARGS>
