@@ -6,7 +6,7 @@
 #include "Callbacks.h"
 
 template <typename CALLABLE, size_t ARGC, typename T1, typename T2>
-bool IterateTuple(const iter& curr, const iter& last, const Command_t<CALLABLE, ARGC, T1, T2>& command) {
+void IterateTuple(const iter& curr, const iter& last, const Command_t<CALLABLE, ARGC, T1, T2>& command) {
     if (command.GetName() == *curr) {
         if (std::distance(curr, last) != ARGC + 1) {
             Throw("Excepted ", ARGC, " arguments, got ", std::distance(curr, last) - 1);
@@ -17,7 +17,7 @@ bool IterateTuple(const iter& curr, const iter& last, const Command_t<CALLABLE, 
 }
 
 template <typename...ARGS>
-bool IterateTuple(const iter& curr, const iter& last, const Branch_t<ARGS...>& branch) {
+void IterateTuple(const iter& curr, const iter& last, const Branch_t<ARGS...>& branch) {
     if (branch.GetName() == *curr) {
         if (std::distance(curr, last) == 1) {
             Throw("Excepted command after branch, got none");
