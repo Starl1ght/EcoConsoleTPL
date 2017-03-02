@@ -83,12 +83,12 @@ std::string GenerateHelp(const Command_t<CALLABLE, ARGC, T1, T2>& cmd) {
 	std::string ret{ " TYPES : " };
 	switch (ARGC) {
 	case 1:
-		ret += DEMANGLE(typeid(typename T1).name());
+		ret += DEMANGLE(typeid(T1).name());
 		break;
 	case 2:
-		ret += DEMANGLE(typeid(typename T1).name());
+		ret += DEMANGLE(typeid(T1).name());
 		ret += ' ';
-		ret += DEMANGLE(typeid(typename T2).name());
+		ret += DEMANGLE(typeid(T2).name());
 		break;
 	default:
 		return "Add something new!";
