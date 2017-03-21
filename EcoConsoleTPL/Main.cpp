@@ -22,7 +22,7 @@ void ProcessTupleElem(const iter& curr, const iter& last, const Branch_t<ARGS...
 			Throw("Excepted command after branch, got none");
 		}
 		ForEach(branch.GetChildren(), [&curr, &last](const auto &elem) {
-            ProcessTupleElem(curr + 1, last, elem);
+			ProcessTupleElem(curr + 1, last, elem);
 		});
 	}
 }
@@ -39,9 +39,9 @@ int main() {
 		MakeBranch("math",
 			MakeCommand("sum", fn::sum),
 			MakeCommand("div", fn::div),
-            MakeCommand("square", fn::square)
+			MakeCommand("square", fn::square)
 		),
-        MakeCommand("reverse", fn::reverse),
+		MakeCommand("reverse", fn::reverse),
 		MakeCommand("exit", fn::con_exit)
 	);
 
