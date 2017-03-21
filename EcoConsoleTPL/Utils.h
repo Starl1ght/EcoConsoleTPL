@@ -7,7 +7,7 @@
 #include <sstream>
 
 template <typename T>
-inline std::vector<std::string> Split(T&& input) {
+std::vector<std::string> Split(T&& input) {
 	std::stringstream ss{ std::forward<T>(input) };
 	return std::vector<std::string> {std::istream_iterator<std::string>(ss), std::istream_iterator<std::string>{} };
 }
@@ -30,7 +30,7 @@ void Throw(ARGS&&...args) {
 }
 
 // Calc depth string
-std::string DepthToString(std::vector<std::string>& depth) {
+inline std::string DepthToString(const std::vector<std::string>& depth) {
 	std::stringstream ss;
 	for (auto&& str : depth) {
 		ss << str << ' ';
