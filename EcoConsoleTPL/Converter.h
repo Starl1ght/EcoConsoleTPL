@@ -27,12 +27,12 @@ inline double Converter<double>(const std::string& str) {
 
 template<>
 inline unsigned long Converter<unsigned long>(const std::string& str) {
-    try {
-        if (str.front() == '-') throw std::exception{};
-        return stoul(str);
-    } catch (...) {
-        Throw("Unable to convert '", str, "' to unsigned long");
-    }
+	try {
+		if (str.front() == '-') throw std::exception{};
+		return stoul(str);
+	} catch (...) {
+		Throw("Unable to convert '", str, "' to unsigned long");
+	}
 }
 
 template<>
