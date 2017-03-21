@@ -12,16 +12,12 @@ public:
 	const std::string& GetName() const {
 		return m_name;
 	}
-	CALLABLE GetFunc() const {
+	const CALLABLE& GetFunc() const {
 		return m_func;
 	}
-
-	static constexpr size_t ArgCount = ARGCOUNT;
-	using ArgType1 = ARG1;
-	using ArgType2 = ARG2;
 private:
 	Command_t(std::string&& name, CALLABLE func) :
-		m_name(name), m_func(func) {}
+		m_name(std::forward<std::string>(name)), m_func(func) {}
 
 	const std::string m_name;
 	const CALLABLE m_func;
@@ -44,7 +40,7 @@ auto MakeCommand(std::string&& name, void(*func)(const T1&, const T2&)) {
 template <typename...CMDS>
 class Branch_t {
 	template <typename...ARGS>
-	friend Branch_t<ARGS...> MakeBranch(std::string&& name, const ARGS&...args);
+	friend Branch_t<ARGS...> MakeBranch(std::string&& name, ARGS&&...args);
 public:
 	const std::string& GetName() const {
 		return m_name;
@@ -53,14 +49,15 @@ public:
 		return m_cmds;
 	}
 private:
-	Branch_t(const std::string& name, const CMDS&...cmds) :
-			m_name(name), m_cmds(std::make_tuple(cmds...)) {};
+	Branch_t(std::string&& name, CMDS&&...cmds) :
+			m_name(std::forward<std::string>(name)),
+            m_cmds(std::forward_as_tuple(cmds...)) {};
 
 	const std::string m_name;
-	std::tuple<CMDS...> m_cmds;
+	const std::tuple<CMDS...> m_cmds;
 };
 
 template <typename...ARGS>
-Branch_t<ARGS...> MakeBranch(std::string&& name, const ARGS&...args) {
-	return Branch_t<ARGS...>(name, args...);
+Branch_t<ARGS...> MakeBranch(std::string&& name, ARGS&&...args) {
+	return Branch_t<ARGS...>(std::forward<std::string>(name), std::forward<ARGS>(args)...);
 }

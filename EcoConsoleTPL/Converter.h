@@ -17,12 +17,22 @@ inline int Converter<int>(const std::string& str) {
 }
 
 template <>
-inline float Converter<float>(const std::string& str) {
+inline double Converter<double>(const std::string& str) {
 	try {
-		return stof(str);
+		return stod(str);
 	} catch (...) {
-		Throw("Unable to convert '", str, "' to float");
+		Throw("Unable to convert '", str, "' to double");
 	}
+}
+
+template<>
+inline unsigned long Converter<unsigned long>(const std::string& str) {
+    try {
+        if (str.front() == '-') throw std::exception{};
+        return stoul(str);
+    } catch (...) {
+        Throw("Unable to convert '", str, "' to unsigned long");
+    }
 }
 
 template<>

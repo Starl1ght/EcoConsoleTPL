@@ -1,18 +1,20 @@
 #pragma once
 #include <iostream>
 
-inline void void0() {
-	std::cout << "CALLED 'void'\n";
-}
-
-inline void int1(const int& i) {
-	std::cout << "CALLED 'int1' ARGS: " << i << '\n';
-}
-
-inline void float2(const float& f1, const float& f2) {
-	std::cout << "CALLED 'float2' ARGS: " << f1 << " " << f2 << '\n';
-}
-
-inline void br_cmd(const std::string& str) {
-	std::cout << "CALLED 'br_cmd' ARGS: " << str << '\n';
+namespace fn {
+    void sum(const int& a, const int& b) {
+        std::cout << a << " + " << b << " = " << a + b << '\n';
+    }
+    void div(const double& a, const double& b) {
+        std::cout << a << " / " << b << " = " << a / b << '\n';
+    }
+    void square(const unsigned long& a) {
+        std::cout << a << " ^ 2 = " << a * a << '\n';
+    }
+    void reverse(const std::string& str) {
+        std::cout << str << " -> " << std::string{ str.rbegin(), str.rend() } << '\n';
+    }
+    void con_exit() {
+        exit(0);
+    }
 }
