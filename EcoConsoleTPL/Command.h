@@ -51,7 +51,7 @@ public:
 private:
 	Branch_t(std::string&& name, CMDS&&...cmds) :
 			m_name(std::forward<std::string>(name)),
-            m_cmds(std::forward_as_tuple(cmds...)) {};
+			m_cmds(std::forward_as_tuple(cmds...)) {};
 
 	const std::string m_name;
 	const std::tuple<CMDS...> m_cmds;
