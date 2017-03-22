@@ -5,9 +5,9 @@ template <typename CALLABLE, size_t ARGCOUNT, typename ARG1 = void, typename ARG
 class Command_t {
 	friend auto MakeCommand(std::string&& name, void(*func)());
 	template <typename T1>
-	friend auto MakeCommand(std::string&& name, void(*func)(const T1&));
+	friend auto MakeCommand(std::string&& name, void(*func)(T1));
 	template <typename T1, typename T2>
-	friend auto MakeCommand(std::string&& name, void(*func)(const T1&, const T2&));
+	friend auto MakeCommand(std::string&& name, void(*func)(T1, T2));
 public:
 	const std::string& GetName() const {
 		return m_name;
@@ -28,13 +28,13 @@ inline auto MakeCommand(std::string&& name, void(*func)()) {
 }
 
 template <typename T1>
-auto MakeCommand(std::string&& name, void(*func)(const T1&)) {
-	return Command_t<decltype(func), 1, T1>(move(name), func);
+auto MakeCommand(std::string&& name, void(*func)(T1)) {
+	return Command_t<decltype(func), 1, std::decay_t<T1>>(move(name), func);
 }
 
 template <typename T1, typename T2>
-auto MakeCommand(std::string&& name, void(*func)(const T1&, const T2&)) {
-	return Command_t<decltype(func), 2, T1, T2>(move(name), func);
+auto MakeCommand(std::string&& name, void(*func)(T1, T2)) {
+	return Command_t<decltype(func), 2, std::decay_t<T1>, std::decay_t<T2>>(move(name), func);
 }
 
 template <typename...CMDS>

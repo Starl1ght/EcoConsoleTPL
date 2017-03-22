@@ -2,7 +2,7 @@
 #include <iostream>
 
 namespace fn {
-	void sum(const int& a, const int& b) {
+	void sum(int a, int b) {
 		std::cout << a << " + " << b << " = " << a + b << '\n';
 	}
 	void div(const double& a, const double& b) {
