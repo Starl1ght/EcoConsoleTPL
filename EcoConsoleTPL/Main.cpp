@@ -5,33 +5,45 @@
 #include "Callbacks.h"
 
 template <typename CALLABLE, size_t ARGC, typename T1, typename T2>
-void ProcessTupleElem(const iter& curr, const iter& last, const Command_t<CALLABLE, ARGC, T1, T2>& command) {
+bool ProcessTupleElem(const iter& curr, const iter& last, const Command_t<CALLABLE, ARGC, T1, T2>& command) {
 	if (command.GetName() == *curr) {
 		if (std::distance(curr, last) != ARGC + 1) {
 			Throw("Excepted ", ARGC, " arguments, got ", std::distance(curr, last) - 1);
 		}
-		auto fn = command.GetFunc();
-		Invoke<ARGC, T1, T2>::Do(fn, curr);
+		Invoke<ARGC, T1, T2>::Do(command.GetFunc(), curr);
+		return true;
 	}
+	return false;
 }
 
 template <typename...ARGS>
-void ProcessTupleElem(const iter& curr, const iter& last, const Branch_t<ARGS...>& branch) {
+bool ProcessTupleElem(const iter& curr, const iter& last, const Branch_t<ARGS...>& branch) {
 	if (branch.GetName() == *curr) {
 		if (std::distance(curr, last) == 1) {
 			Throw("Excepted command after branch, got none");
 		}
-		ForEach(branch.GetChildren(), [&curr, &last](const auto &elem) {
-			ProcessTupleElem(curr + 1, last, elem);
+		bool found{ false };
+		ForEach(branch.GetChildren(), [&found, &curr, &last] (const auto &elem) {
+			found |= ProcessTupleElem(curr + 1, last, elem);
 		});
+		if (!found) {
+			Throw("command '", *curr, "' not found in branch '", *(curr + 1), "'");
+		}
+		return true;
 	}
+	return false;
 }
 
 template <typename...ARGS>
 void MagicStartsHere(const std::tuple<ARGS...>& cmds, std::vector<std::string>&& tokens) {
-	ForEach(cmds, [&tokens] (auto&& elem) {
-		ProcessTupleElem(tokens.cbegin(), tokens.cend(), elem);
+	if (tokens.empty()) return;
+	bool found{ false };
+	ForEach(cmds, [&found, &tokens] (auto&& elem) {
+		found |= ProcessTupleElem(tokens.cbegin(), tokens.cend(), elem);
 	});
+	if (!found) {
+		Throw("command '", tokens.front(), "' not found");
+	}
 }
 
 int main() {
