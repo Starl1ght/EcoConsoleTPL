@@ -1,13 +1,10 @@
 #pragma once
 #include <string>
 
-template <typename CALLABLE, size_t ARGCOUNT, typename ARG1 = void, typename ARG2 = void>
+template <typename CALLABLE, typename...TYPES>
 class Command_t {
-	friend auto MakeCommand(std::string&& name, void(*func)());
-	template <typename T1>
-	friend auto MakeCommand(std::string&& name, void(*func)(T1));
-	template <typename T1, typename T2>
-	friend auto MakeCommand(std::string&& name, void(*func)(T1, T2));
+	template <typename...ARGS>
+	friend auto MakeCommand(std::string&& name, void(*func)(ARGS...));
 public:
 	const std::string& GetName() const {
 		return m_name;
@@ -17,24 +14,15 @@ public:
 	}
 private:
 	Command_t(std::string&& name, CALLABLE func) :
-		m_name(std::forward<std::string>(name)), m_func(func) {}
+			m_name(std::forward<std::string>(name)), m_func(func) {}
 
 	const std::string m_name;
 	const CALLABLE m_func;
 };
 
-inline auto MakeCommand(std::string&& name, void(*func)()) {
-	return Command_t<decltype(func), 0>(move(name), func);
-}
-
-template <typename T1>
-auto MakeCommand(std::string&& name, void(*func)(T1)) {
-	return Command_t<decltype(func), 1, std::decay_t<T1>>(move(name), func);
-}
-
-template <typename T1, typename T2>
-auto MakeCommand(std::string&& name, void(*func)(T1, T2)) {
-	return Command_t<decltype(func), 2, std::decay_t<T1>, std::decay_t<T2>>(move(name), func);
+template <typename...ARGS>
+auto MakeCommand(std::string&& name, void(*func)(ARGS...)) {
+	return Command_t<decltype(func), std::decay_t<ARGS>...>(move(name), func);
 }
 
 template <typename...CMDS>

@@ -4,13 +4,13 @@
 #include "Invoke.h"
 #include "Callbacks.h"
 
-template <typename CALLABLE, size_t ARGC, typename T1, typename T2>
-bool ProcessTupleElem(const iter& curr, const iter& last, const Command_t<CALLABLE, ARGC, T1, T2>& command) {
+template <typename CALLABLE, typename...TYPES>
+bool ProcessTupleElem(const iter& curr, const iter& last, const Command_t<CALLABLE, TYPES...>& command) {
 	if (command.GetName() == *curr) {
-		if (std::distance(curr, last) != ARGC + 1) {
-			Throw("Excepted ", ARGC, " arguments, got ", std::distance(curr, last) - 1);
+		if (std::distance(curr, last) != sizeof...(TYPES) + 1) {
+			Throw("Excepted ", sizeof...(TYPES), " arguments, got ", std::distance(curr, last) - 1);
 		}
-		Invoke<ARGC, T1, T2>::Do(command.GetFunc(), curr);
+		Invoke<sizeof...(TYPES), TYPES...>::Do(command.GetFunc(), curr);
 		return true;
 	}
 	return false;
