@@ -5,19 +5,19 @@
 #include "Callbacks.h"
 
 template <typename CALLABLE, typename...TYPES>
-bool ProcessTupleElem(const iter& curr, const iter& last, const Command_t<CALLABLE, TYPES...>& command) {
+bool ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::vector<std::string>::const_iterator last, const Command_t<CALLABLE, TYPES...>& command) {
 	if (command.GetName() == *curr) {
 		if (std::distance(curr, last) != sizeof...(TYPES) + 1) {
 			Throw("Excepted ", sizeof...(TYPES), " arguments, got ", std::distance(curr, last) - 1);
 		}
-		Invoke<sizeof...(TYPES), TYPES...>::Do(command.GetFunc(), curr);
+		Invoke(command.GetFunc(), curr);
 		return true;
 	}
 	return false;
 }
 
 template <typename...ARGS>
-bool ProcessTupleElem(const iter& curr, const iter& last, const Branch_t<ARGS...>& branch) {
+bool ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::vector<std::string>::const_iterator last, const Branch_t<ARGS...>& branch) {
 	if (branch.GetName() == *curr) {
 		if (std::distance(curr, last) == 1) {
 			Throw("Excepted command after branch, got none");

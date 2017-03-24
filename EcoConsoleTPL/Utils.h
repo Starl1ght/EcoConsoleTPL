@@ -29,22 +29,17 @@ void Throw(ARGS&&...args) {
 	ThrowInternal(ss, std::forward<ARGS>(args)...);
 }
 
-// Calc depth string
-inline std::string DepthToString(const std::vector<std::string>& depth) {
-	std::stringstream ss;
-	for (auto&& str : depth) {
-		ss << str << ' ';
-	}
-	return ss.str();
-}
-
 // ForEach tuple
 template <size_t CUR, size_t END>
 struct ForEachIter_t {
 	template <typename CALLABLE, typename...TYPES>
 	static void Do(const std::tuple<TYPES...>& tpl, CALLABLE&& func) {
-		auto& tplItem = std::get<CUR>(tpl);
-		func(tplItem);
+		func(std::get<CUR>(tpl));
+		ForEachIter_t<CUR + 1, END>::Do(tpl, func);
+	}
+	template <typename CALLABLE, typename...TYPES>
+	static void Do(std::tuple<TYPES...>& tpl, CALLABLE&& func) {
+		func(std::get<CUR>(tpl));
 		ForEachIter_t<CUR + 1, END>::Do(tpl, func);
 	}
 };
@@ -59,4 +54,21 @@ template <typename CALLABLE, typename...TYPES>
 void ForEach(const std::tuple<TYPES...>& tpl, CALLABLE&& func) {
 	constexpr size_t tplSize = std::tuple_size<std::tuple<TYPES...>>::value;
 	ForEachIter_t<0, tplSize>::Do(tpl, func);
+}
+
+template <typename CALLABLE, typename...TYPES>
+void ForEach(std::tuple<TYPES...>& tpl, CALLABLE&& func) {
+	constexpr size_t tplSize = std::tuple_size<std::tuple<TYPES...>>::value;
+	ForEachIter_t<0, tplSize>::Do(tpl, func);
+}
+
+// Expand Tuple to function
+template <typename...TYPES, typename CALLABLE, size_t...IDX>
+void ExpandHelper(const std::tuple<TYPES...>& tpl, CALLABLE&& func, std::index_sequence<IDX...>&& idx) {
+	func(std::get<IDX>(tpl)...);
+}
+
+template <typename...TYPES, typename CALLABLE>
+void ExpandAndCall(const std::tuple<TYPES...>& tpl, CALLABLE&& func) {
+	ExpandHelper(tpl, std::forward<CALLABLE>(func), std::make_index_sequence<sizeof...(TYPES)>());
 }
