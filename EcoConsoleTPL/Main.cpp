@@ -52,7 +52,7 @@ IterResult ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::
 				Throw("incorrect argument count");
 				break;
 			case IterResult::Ok:
-				break;
+				return IterResult::Ok;
 		}
 	}
 	return IterResult::NotFound;
