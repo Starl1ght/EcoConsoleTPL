@@ -4,45 +4,78 @@
 #include "Invoke.h"
 #include "Callbacks.h"
 
+enum class IterResult {
+	NotFound,
+	WrongArgCount,
+	Ok
+};
+
+IterResult NewGlobalResult(IterResult global, IterResult local) {
+	if (local == IterResult::Ok) {
+		return IterResult::Ok;
+	}
+	if (global == IterResult::NotFound && local == IterResult::WrongArgCount) {
+		IterResult::WrongArgCount;
+	}
+	return global;
+}
+
 template <typename CALLABLE, typename...TYPES>
-bool ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::vector<std::string>::const_iterator last, const Command_t<CALLABLE, TYPES...>& command) {
+IterResult ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::vector<std::string>::const_iterator last, const Command_t<CALLABLE, TYPES...>& command) {
 	if (command.GetName() == *curr) {
 		if (std::distance(curr, last) != sizeof...(TYPES) + 1) {
-			Throw("Excepted ", sizeof...(TYPES), " arguments, got ", std::distance(curr, last) - 1);
+			return IterResult::WrongArgCount;
 		}
 		Invoke(command.GetFunc(), curr);
-		return true;
+		return IterResult::Ok;
 	}
-	return false;
+	return IterResult::NotFound;
 }
 
 template <typename...ARGS>
-bool ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::vector<std::string>::const_iterator last, const Branch_t<ARGS...>& branch) {
+IterResult ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::vector<std::string>::const_iterator last, const Branch_t<ARGS...>& branch) {
 	if (branch.GetName() == *curr) {
 		if (std::distance(curr, last) == 1) {
 			Throw("Excepted command after branch, got none");
 		}
-		bool found{ false };
-		ForEach(branch.GetChildren(), [&found, &curr, &last] (const auto &elem) {
-			found |= ProcessTupleElem(curr + 1, last, elem);
+		IterResult global{ IterResult::NotFound };
+		ForEach(branch.GetChildren(), [&global, &curr, &last] (const auto &elem) {
+			const auto local = ProcessTupleElem(curr + 1, last, elem);
+			global = NewGlobalResult(global, local);
 		});
-		if (!found) {
-			Throw("command '", *curr, "' not found in branch '", *(curr + 1), "'");
+
+		switch(global) {
+			case IterResult::NotFound:
+				Throw("command '", *curr, "' not found in branch '", *(curr + 1), "'");
+				break;
+			case IterResult::WrongArgCount:
+				Throw("incorrect argument count");
+				break;
+			case IterResult::Ok:
+				break;
 		}
-		return true;
 	}
-	return false;
+	return IterResult::NotFound;
 }
 
 template <typename...ARGS>
 void MagicStartsHere(const std::tuple<ARGS...>& cmds, std::vector<std::string>&& tokens) {
 	if (tokens.empty()) return;
-	bool found{ false };
-	ForEach(cmds, [&found, &tokens] (auto&& elem) {
-		found |= ProcessTupleElem(tokens.cbegin(), tokens.cend(), elem);
+	IterResult global{ IterResult::NotFound };
+	ForEach(cmds, [&global, &tokens] (auto&& elem) {
+		const auto local = ProcessTupleElem(tokens.cbegin(), tokens.cend(), elem);
+		global = NewGlobalResult(global, local);
 	});
-	if (!found) {
-		Throw("command '", tokens.front(), "' not found");
+
+	switch(global) {
+		case IterResult::NotFound:
+			Throw("command '", tokens.front(), "' not found");
+			break;
+		case IterResult::WrongArgCount:
+			Throw("incorrect argument count");
+			break;
+		case IterResult::Ok:
+			break;
 	}
 }
 
@@ -53,6 +86,9 @@ int main() {
 			MakeCommand("div", fn::div),
 			MakeCommand("square", fn::square)
 		),
+		MakeCommand("variadic", fn::variadic<std::string>),
+		MakeCommand("variadic", fn::variadic<std::string, std::string>),
+		MakeCommand("variadic", fn::variadic<std::string, int, std::string>),
 		MakeCommand("reverse", fn::reverse),
 		MakeCommand("exit", fn::con_exit)
 	);

@@ -17,4 +17,9 @@ namespace fn {
 	inline void con_exit() {
 		exit(0);
 	}
+
+	template<typename...ARGS>
+	inline void variadic(const ARGS&...args) {
+		std::cout << "I am variadic with " << sizeof...(ARGS) << " args!\n";
+	}
 }
