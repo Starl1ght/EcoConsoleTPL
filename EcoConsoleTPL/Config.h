@@ -1,4 +1,5 @@
 #pragma once
+
 template <typename T>
 class Field_t {
 	template <typename VALTYPE>
@@ -65,7 +66,33 @@ Section_t<FIELDS...> MakeSection(std::string&& name, FIELDS&&...fields) {
 
 template <typename T>
 bool EditConfTree(const Field_t<T>& field) {
-	Throw("New value is missing for '",field.GetName(), "'");
+	Throw("New value is missing for '", field.GetName(), "'");
+	return false;
+}
+
+template <typename T>
+typename std::enable_if<!std::is_same<T, std::string>::value, bool>::type
+EditConfTree(Field_t<T>& field, const T& val) {
+	field.Set(val);
+	return true;
+}
+
+template <typename T>
+bool EditConfTree(Field_t<T>& field, const std::string& toConvert) {
+	field.Set(Converter<T>(toConvert));
+	return true;
+}
+
+template <typename T, typename...DUMMY>
+bool EditConfTree(const Field_t<T>&, const std::string&, DUMMY&&...) {
+	Throw("Extra arguments supplied");
+	return false;
+}
+
+template <typename T, typename...DUMMY>
+typename std::enable_if<!std::is_same<T,std::string>::value, bool>::type
+EditConfTree(const Field_t<T>&, const T&, DUMMY&&...) {
+	Throw("Extra arguments supplied");
 	return false;
 }
 
@@ -73,15 +100,6 @@ template <typename...FIELDS>
 bool EditConfTree(Section_t<FIELDS...>& sect) {
 	Throw("Field inside section '", sect.GetName(), "' and new value required");
 	return false;
-}
-
-template <typename T, typename...STRINGS>
-bool EditConfTree(Field_t<T>& field, const std::string& toConvert, const STRINGS&...) {
-	if (sizeof...(STRINGS) != 0) {
-		Throw("Additional useless arguments in 'edit'");
-	}
-	field.Set(Converter<std::decay_t<T>>(toConvert));
-	return true;
 }
 
 template <typename...FIELDS, typename...STRINGS>

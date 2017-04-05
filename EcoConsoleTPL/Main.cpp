@@ -4,6 +4,8 @@
 #include "Invoke.h"
 #include "Callbacks.h"
 
+using namespace std::string_literals;
+
 enum class IterResult {
 	NotFound,
 	WrongArgCount,
@@ -86,6 +88,7 @@ int main() {
 			MakeCommand("div", fn::div),
 			MakeCommand("square", fn::square)
 		),
+		MakeCommand("edit", fn::edit),
 		MakeCommand("edit", fn::edit<std::string>),
 		MakeCommand("edit", fn::edit<std::string, std::string>),
 		MakeCommand("edit", fn::edit<std::string, std::string, std::string>),
@@ -98,6 +101,9 @@ int main() {
 		MakeCommand("reverse", fn::reverse),
 		MakeCommand("exit", fn::con_exit)
 	);
+
+	fn::edit("sect"s, "cat"s, "AMAZING GOSHMAN"s);
+	fn::edit("moo"s, "false"s);
 
 	while (true) {
 		std::cout << "> ";
