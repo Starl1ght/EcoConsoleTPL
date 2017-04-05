@@ -46,7 +46,7 @@ IterResult ProcessTupleElem(std::vector<std::string>::const_iterator curr, std::
 
 		switch(global) {
 			case IterResult::NotFound:
-				Throw("command '", *curr, "' not found in branch '", *(curr + 1), "'");
+				Throw("command '", *(curr + 1), "' not found in branch '", *curr, "'");
 				break;
 			case IterResult::WrongArgCount:
 				Throw("incorrect argument count");
