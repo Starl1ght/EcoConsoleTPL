@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "Config.h"
 
 namespace fn {
 	inline void sum(int a, int b) {
@@ -18,8 +19,20 @@ namespace fn {
 		exit(0);
 	}
 
+	inline void edit() {
+		Throw("You cannot edit nothing");
+	}
 	template<typename...ARGS>
-	inline void variadic(const ARGS&...args) {
-		std::cout << "I am variadic with " << sizeof...(ARGS) << " args!\n";
+	void edit(const ARGS&...args) {
+		StartEdit(ConfigTree, args...);
+	}
+
+	template<typename...ARGS>
+	void view(const ARGS&...args) {
+		StartView(ConfigTree, args...);
+	}
+
+	inline void view() {
+		StartView(ConfigTree);
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <algorithm>
+#include <locale>
 
 template <typename T>
 T Converter(const std::string&) {
@@ -38,4 +40,17 @@ inline unsigned long Converter<unsigned long>(const std::string& str) {
 template<>
 inline std::string Converter<std::string>(const std::string& str) {
 	return str;
+}
+
+template<>
+inline bool Converter<bool>(const std::string& str) {
+	std::string lowered;
+	transform(str.begin(), str.end(), std::back_inserter(lowered), ::tolower);
+	if (lowered == "true" || lowered == "1" || lowered == "enable" || lowered == "enabled") {
+		return true;
+	}
+	if (lowered == "false" || lowered == "0" || lowered == "disable" || lowered == "disabled") {
+		return false;
+	}
+	Throw("Unable to convert '", str, "' to bool");
 }

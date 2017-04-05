@@ -86,9 +86,15 @@ int main() {
 			MakeCommand("div", fn::div),
 			MakeCommand("square", fn::square)
 		),
-		MakeCommand("variadic", fn::variadic<std::string>),
-		MakeCommand("variadic", fn::variadic<std::string, std::string>),
-		MakeCommand("variadic", fn::variadic<std::string, int, std::string>),
+		MakeCommand("edit", fn::edit<std::string>),
+		MakeCommand("edit", fn::edit<std::string, std::string>),
+		MakeCommand("edit", fn::edit<std::string, std::string, std::string>),
+		MakeCommand("edit", fn::edit<std::string, std::string, std::string, std::string>),
+		MakeCommand("view", fn::view),
+		MakeCommand("view", fn::view<std::string>),
+		MakeCommand("view", fn::view<std::string, std::string>),
+		MakeCommand("view", fn::view<std::string, std::string, std::string>),
+		MakeCommand("view", fn::view<std::string, std::string, std::string, std::string>),
 		MakeCommand("reverse", fn::reverse),
 		MakeCommand("exit", fn::con_exit)
 	);

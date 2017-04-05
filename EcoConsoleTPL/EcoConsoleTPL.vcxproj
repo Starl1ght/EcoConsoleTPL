@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Invoke.h" />
     <ClInclude Include="Utils.h" />

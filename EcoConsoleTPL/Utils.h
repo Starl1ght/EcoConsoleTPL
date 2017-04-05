@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include "config.h"
 
 template <typename T>
 std::vector<std::string> Split(T&& input) {
@@ -70,5 +71,15 @@ void ExpandHelper(const std::tuple<TYPES...>& tpl, CALLABLE&& func, std::index_s
 
 template <typename...TYPES, typename CALLABLE>
 void ExpandAndCall(const std::tuple<TYPES...>& tpl, CALLABLE&& func) {
+	ExpandHelper(tpl, std::forward<CALLABLE>(func), std::make_index_sequence<sizeof...(TYPES)>());
+}
+
+template <typename...TYPES, typename CALLABLE, size_t...IDX>
+void ExpandHelper(std::tuple<TYPES...>& tpl, CALLABLE&& func, std::index_sequence<IDX...>&& idx) {
+	func(std::get<IDX>(tpl)...);
+}
+
+template <typename...TYPES, typename CALLABLE>
+void ExpandAndCall(std::tuple<TYPES...>& tpl, CALLABLE&& func) {
 	ExpandHelper(tpl, std::forward<CALLABLE>(func), std::make_index_sequence<sizeof...(TYPES)>());
 }
