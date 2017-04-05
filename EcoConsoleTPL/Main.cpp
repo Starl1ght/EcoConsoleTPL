@@ -15,7 +15,7 @@ IterResult NewGlobalResult(IterResult global, IterResult local) {
 		return IterResult::Ok;
 	}
 	if (global == IterResult::NotFound && local == IterResult::WrongArgCount) {
-		IterResult::WrongArgCount;
+		return IterResult::WrongArgCount;
 	}
 	return global;
 }
