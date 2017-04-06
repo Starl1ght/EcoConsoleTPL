@@ -5,7 +5,6 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
-#include "config.h"
 
 template <typename T>
 std::vector<std::string> Split(T&& input) {

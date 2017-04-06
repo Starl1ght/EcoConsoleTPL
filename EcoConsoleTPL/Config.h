@@ -1,4 +1,5 @@
 #pragma once
+#include "Utils.h"
 
 template <typename T>
 class Field_t {
@@ -70,11 +71,24 @@ bool EditConfTree(const Field_t<T>& field) {
 	return false;
 }
 
-template <typename T>
+/*template <typename T>
 typename std::enable_if<!std::is_same<T, std::string>::value, bool>::type
 EditConfTree(Field_t<T>& field, const T& val) {
 	field.Set(val);
 	return true;
+}*/
+
+template <typename T>
+std::enable_if_t<!std::is_same_v<T, std::string>, bool>
+EditConfTree(Field_t<T>& field, const T& val) {
+	field.Set(val);
+	return true;
+}
+
+template <typename T, typename U>
+std::enable_if_t<!std::is_same_v<U, std::string>, bool>
+EditConfTree(Field_t<T>& field, const U& val) {
+	return false;
 }
 
 template <typename T>

@@ -1,6 +1,6 @@
 #include <tuple>
 #include "Command.h"
-#include "Utils.h"
+#include "Config.h"
 #include "Invoke.h"
 #include "Callbacks.h"
 
@@ -103,7 +103,7 @@ int main() {
 	);
 
 	fn::edit("sect"s, "cat"s, "AMAZING GOSHMAN"s);
-	fn::edit("moo"s, "false"s);
+	//fn::edit("moo"s, true);
 
 	while (true) {
 		std::cout << "> ";

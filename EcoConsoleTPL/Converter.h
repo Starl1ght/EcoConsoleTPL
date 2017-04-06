@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <locale>
+#include "Utils.h"
 
 template <typename T>
 T Converter(const std::string&) {

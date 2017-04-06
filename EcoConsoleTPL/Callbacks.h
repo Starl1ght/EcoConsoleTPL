@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "Config.h"
+#include "Utils.h"
 
 namespace fn {
 	inline void sum(int a, int b) {
